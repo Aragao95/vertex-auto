@@ -1,0 +1,53 @@
+---
+import Icon from './Icon.astro';
+import { whatsappLink } from '../data/site';
+---
+
+<section class="strip" aria-label="Contato">
+  <div class="container strip__inner">
+    <div>
+      <h2>Não achou o que procurava?</h2>
+      <p>A gente avisa assim que um carro do seu perfil entrar no estoque.</p>
+    </div>
+    <a
+      class="btn btn-primary"
+      href={whatsappLink('Olá! Vim pelo site da Vertex Auto e quero ser avisado quando entrar um carro do meu perfil.')}
+      target="_blank"
+      rel="noopener"
+    >
+      <Icon name="whatsapp" /> Falar no WhatsApp
+    </a>
+  </div>
+</section>
+
+<style>
+  .strip {
+    padding-block: 64px;
+    background: var(--surface-2);
+  }
+  .strip__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 24px 40px;
+  }
+  h2 {
+    font-size: clamp(1.5rem, 2.4vw, 1.75rem);
+    text-transform: none;
+    color: #fff;
+  }
+  p {
+    margin-top: 8px;
+    font-size: 0.9375rem;
+    color: rgb(255 255 255 / 0.7);
+  }
+  .btn {
+    padding: 16px 32px;
+  }
+  @media (max-width: 560px) {
+    .btn {
+      width: 100%;
+    }
+  }
+</style>

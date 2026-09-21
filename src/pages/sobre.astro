@@ -1,0 +1,267 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { cars, carBySlug } from '../data/cars';
+import { site, whatsappLink } from '../data/site';
+
+const golf = carBySlug('golf-harlequin')!.fotos[0];
+const nomes = Object.fromEntries(cars.map((c) => [c.slug, c.nome]));
+
+const numeros = [
+  { valor: '[Nº]+', label: 'carros vendidos' },
+  { valor: '[Nº] anos', label: 'de mercado' },
+  { valor: '[Nº]%', label: 'de clientes que voltam' },
+];
+
+const contatos = [
+  { label: 'Endereço', value: site.address },
+  { label: 'WhatsApp', value: site.whatsappDisplay, href: whatsappLink('Olá! Vim pelo site da Vertex Auto.') },
+  { label: 'Horário', value: site.hours },
+  { label: 'E-mail', value: site.email },
+];
+---
+
+<Base title="Sobre e contato" description="Conheça a Vertex Auto e fale com a gente.">
+  <div class="container">
+    <section class="intro">
+      <div>
+        <span class="eyebrow">Sobre a Vertex</span>
+        <h1>Carro bom se vende com verdade</h1>
+        <p>[História da loja: como começou, o que a diferencia e que tipo de carro ela escolhe ter no estoque.]</p>
+        <p>
+          Cada carro é revisado e fotografado antes de entrar no estoque, para que o anúncio mostre exatamente o
+          que você vai encontrar.
+        </p>
+      </div>
+      <Image src={golf} alt="VW Golf Harlequin colorido" widths={[600, 900, 1300]} sizes="(max-width: 900px) 100vw, 620px" />
+    </section>
+
+    <ul class="numbers">
+      {
+        numeros.map((n) => (
+          <li>
+            <strong>{n.valor}</strong>
+            <span>{n.label}</span>
+          </li>
+        ))
+      }
+    </ul>
+
+    <section class="contact" id="contato">
+      <div>
+        <h2>Fale com a gente</h2>
+        <p class="contact__lead">Dúvida sobre um carro, visita ou avaliação? Responde quem cuida do estoque.</p>
+        <dl class="contact__list">
+          {
+            contatos.map((c) => (
+              <div>
+                <dt>{c.label}</dt>
+                <dd>
+                  {c.href ? (
+                    <a href={c.href} target="_blank" rel="noopener">
+                      {c.value}
+                    </a>
+                  ) : (
+                    c.value
+                  )}
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+
+      <div class="form-card" data-form-wrap>
+        <form data-fake-form>
+          <div class="form-grid">
+            <div class="field">
+              <label class="label" for="ct-nome">Nome</label>
+              <input id="ct-nome" name="nome" class="input" placeholder="Seu nome" autocomplete="name" required />
+            </div>
+            <div class="field">
+              <label class="label" for="ct-tel">Telefone</label>
+              <input id="ct-tel" name="telefone" class="input" type="tel" placeholder="(00) 00000-0000" autocomplete="tel" />
+            </div>
+            <div class="field field--full">
+              <label class="label" for="ct-email">E-mail</label>
+              <input id="ct-email" name="email" class="input" type="email" placeholder="voce@email.com" autocomplete="email" required />
+            </div>
+            <div class="field field--full">
+              <label class="label" for="ct-msg">Mensagem</label>
+              <textarea
+                id="ct-msg"
+                name="mensagem"
+                class="textarea"
+                rows="5"
+                placeholder="Qual carro te interessou?"
+                required
+                data-mensagem
+                data-nomes={JSON.stringify(nomes)}></textarea>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-block submit" type="submit">Enviar mensagem</button>
+        </form>
+
+        <div class="confirm" data-form-confirm hidden>
+          <span class="confirm-icon"><Icon name="check" size={30} /></span>
+          <h3 tabindex="-1">Mensagem enviada</h3>
+          <p>Respondemos em breve.</p>
+          <button type="button" class="btn btn-outline" data-form-reset>Enviar outra</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<script>
+  // "Agendar visita" na página do carro chega aqui com ?carro=<slug>.
+  const slug = new URLSearchParams(location.search).get('carro');
+  const msg = document.querySelector<HTMLTextAreaElement>('[data-mensagem]')!;
+  const nome = slug ? (JSON.parse(msg.dataset.nomes!) as Record<string, string>)[slug] : undefined;
+  if (nome) msg.value = `Olá! Gostaria de agendar uma visita para ver o ${nome}.`;
+</script>
+
+<style>
+  .intro {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 72px;
+    align-items: center;
+    padding-block: 88px 72px;
+  }
+  .intro h1 {
+    margin-top: 14px;
+    font-size: clamp(2.2rem, 4vw, 3.25rem);
+  }
+  .intro p {
+    max-width: 560px;
+    margin-top: 16px;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    color: var(--text-soft);
+  }
+  .intro h1 + p {
+    margin-top: 24px;
+  }
+  .intro :global(img) {
+    width: 100%;
+    height: 480px;
+    object-fit: cover;
+    border-radius: var(--radius);
+  }
+
+  .numbers {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 48px;
+    margin: 0;
+    padding: 40px 0;
+    list-style: none;
+    border-block: 1px solid var(--border);
+  }
+  .numbers strong {
+    display: block;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.2rem, 3.4vw, 2.75rem);
+    line-height: 1.2;
+  }
+  .numbers span {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+
+  .contact {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 64px;
+    margin-block: 88px;
+    padding: 56px;
+    background: var(--surface-2);
+    border-radius: 16px;
+  }
+  .contact h2 {
+    font-size: clamp(1.8rem, 3vw, 2.25rem);
+    color: #fff;
+  }
+  .contact__lead {
+    margin: 12px 0 20px;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: rgb(255 255 255 / 0.7);
+  }
+  .contact__list {
+    margin: 0;
+  }
+  .contact__list div {
+    padding: 18px 0;
+    border-bottom: 1px solid rgb(255 255 255 / 0.12);
+  }
+  .contact__list dt {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.55);
+  }
+  .contact__list dd {
+    margin: 6px 0 0;
+    color: #fff;
+  }
+  .contact__list a {
+    color: #fff;
+  }
+  .contact__list a:hover {
+    color: var(--accent-hover);
+  }
+
+  .form-card {
+    padding: 32px;
+    background: var(--surface);
+    border-radius: var(--radius);
+  }
+  .form-grid {
+    gap: 16px;
+  }
+  .submit {
+    margin-top: 20px;
+    padding: 16px;
+  }
+
+  @media (max-width: 960px) {
+    .intro,
+    .contact {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+    .intro {
+      padding-block: 56px;
+    }
+    .intro :global(img) {
+      height: auto;
+      aspect-ratio: 3 / 2;
+    }
+    .contact {
+      margin-block: 56px;
+      padding: 32px;
+    }
+  }
+  @media (max-width: 600px) {
+    .numbers {
+      grid-template-columns: 1fr;
+      gap: 24px;
+      padding: 32px 0;
+    }
+    .contact {
+      margin-inline: calc(-1 * var(--gutter));
+      padding: 32px var(--gutter);
+      border-radius: 0;
+    }
+    .form-card {
+      padding: 22px;
+    }
+  }
+</style>

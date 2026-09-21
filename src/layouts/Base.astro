@@ -1,0 +1,65 @@
+---
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { url } from '../lib/url';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title,
+  description = 'Vertex Auto: carros selecionados, revisados e com fotos reais. Projeto conceito.',
+} = Astro.props;
+const fullTitle = title ? `${title} · Vertex Auto` : 'Vertex Auto · Encontre o carro certo, sem rodeio';
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#0F1110" />
+    <link rel="icon" type="image/svg+xml" href={url('favicon.svg')} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap"
+    />
+  </head>
+  <body>
+    <Nav />
+    <main>
+      <slot />
+    </main>
+    <Footer />
+
+    <script>
+      // Formulários de demonstração: nada é enviado, só mostramos a confirmação.
+      document.querySelectorAll<HTMLFormElement>('form[data-fake-form]').forEach((form) => {
+        const wrap = form.closest('[data-form-wrap]');
+        const confirm = wrap?.querySelector<HTMLElement>('[data-form-confirm]');
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          if (!form.reportValidity()) return;
+          form.hidden = true;
+          if (confirm) {
+            confirm.hidden = false;
+            confirm.querySelector<HTMLElement>('h3')?.focus();
+          }
+        });
+        confirm?.querySelector('[data-form-reset]')?.addEventListener('click', () => {
+          form.reset();
+          confirm.hidden = true;
+          form.hidden = false;
+          form.querySelector<HTMLElement>('input, select, textarea')?.focus();
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,146 @@
+---
+// Simulador ilustrativo pela Tabela Price. Não é oferta de crédito.
+const TAXA = 0.015;
+const entradas = [20, 30, 50];
+const prazos = [24, 36, 48, 60];
+const entradaPadrao = 30;
+const prazoPadrao = 48;
+---
+
+<div class="sim" data-sim data-taxa={TAXA}>
+  <h2>Simule o financiamento</h2>
+
+  <div class="sim__field">
+    <label class="label" for="sim-valor">Valor do carro (R$)</label>
+    <input id="sim-valor" class="input" type="text" inputmode="numeric" placeholder="Digite o valor" autocomplete="off" data-valor />
+  </div>
+
+  <div class="sim__field">
+    <span class="label" id="sim-entrada">Entrada</span>
+    <div class="chips" role="group" aria-labelledby="sim-entrada">
+      {entradas.map((e) => <button type="button" class="chip" data-entrada={e} aria-pressed={e === entradaPadrao ? 'true' : 'false'}>{e}%</button>)}
+    </div>
+  </div>
+
+  <div class="sim__field">
+    <span class="label" id="sim-prazo">Prazo</span>
+    <div class="chips" role="group" aria-labelledby="sim-prazo">
+      {prazos.map((p) => <button type="button" class="chip" data-prazo={p} aria-pressed={p === prazoPadrao ? 'true' : 'false'}>{p}x</button>)}
+    </div>
+  </div>
+
+  <div class="sim__result" aria-live="polite">
+    <p class="sim__label">Parcela estimada</p>
+    <p class="sim__value" data-parcela>—</p>
+    <p class="sim__note" data-nota>Digite o valor do carro para simular.</p>
+    <p class="sim__note">Taxa ilustrativa de 1,5% a.m., sujeita a análise de crédito.</p>
+  </div>
+</div>
+
+<style>
+  .sim {
+    padding: 28px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  h2 {
+    font-size: 1.375rem;
+  }
+  .sim__field {
+    margin-top: 18px;
+  }
+  .sim__field:first-of-type {
+    margin-top: 20px;
+  }
+  .chip {
+    padding: 13px 20px;
+  }
+  .sim__result {
+    margin-top: 24px;
+    padding: 20px;
+    border-radius: 8px;
+    background: var(--bg);
+  }
+  .sim__label {
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+  .sim__value {
+    margin-top: 4px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+  .sim__note {
+    margin-top: 6px;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+  .sim__note + .sim__note {
+    margin-top: 2px;
+  }
+  @media (max-width: 480px) {
+    .sim {
+      padding: 22px;
+    }
+    .sim__value {
+      font-size: 1.6rem;
+    }
+  }
+</style>
+
+<script>
+  const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+  const inteiro = new Intl.NumberFormat('pt-BR');
+
+  document.querySelectorAll<HTMLElement>('[data-sim]').forEach((sim) => {
+    const taxa = Number(sim.dataset.taxa);
+    const input = sim.querySelector<HTMLInputElement>('[data-valor]')!;
+    const entradaChips = [...sim.querySelectorAll<HTMLButtonElement>('[data-entrada]')];
+    const prazoChips = [...sim.querySelectorAll<HTMLButtonElement>('[data-prazo]')];
+    const parcelaEl = sim.querySelector<HTMLElement>('[data-parcela]')!;
+    const notaEl = sim.querySelector<HTMLElement>('[data-nota]')!;
+
+    const ativo = (chips: HTMLButtonElement[], key: string) =>
+      Number(chips.find((c) => c.getAttribute('aria-pressed') === 'true')!.dataset[key]);
+
+    let valor = 0;
+    let entradaPct = ativo(entradaChips, 'entrada');
+    let prazo = ativo(prazoChips, 'prazo');
+
+    function calc() {
+      const entrada = valor * (entradaPct / 100);
+      const financiado = valor - entrada;
+      // Tabela Price: PMT = PV · i / (1 − (1 + i)^−n)
+      const parcela = financiado > 0 ? (financiado * taxa) / (1 - Math.pow(1 + taxa, -prazo)) : 0;
+
+      parcelaEl.textContent = parcela > 0 ? `${prazo}x de ${brl.format(parcela)}` : '—';
+      notaEl.textContent =
+        parcela > 0
+          ? `Entrada de ${brl.format(entrada)} · valor financiado de ${brl.format(financiado)}.`
+          : 'Digite o valor do carro para simular.';
+    }
+
+    // Mantém só dígitos e exibe com separador de milhar (ex.: 250.000).
+    input.addEventListener('input', () => {
+      const digits = input.value.replace(/\D/g, '').slice(0, 10);
+      valor = Number(digits || 0);
+      input.value = digits ? inteiro.format(valor) : '';
+      calc();
+    });
+
+    const bind = (chips: HTMLButtonElement[], onPick: (chip: HTMLButtonElement) => void) =>
+      chips.forEach((chip) =>
+        chip.addEventListener('click', () => {
+          chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+          onPick(chip);
+          calc();
+        }),
+      );
+    bind(entradaChips, (c) => (entradaPct = Number(c.dataset.entrada)));
+    bind(prazoChips, (c) => (prazo = Number(c.dataset.prazo)));
+    calc();
+  });
+</script>

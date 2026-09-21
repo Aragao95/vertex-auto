@@ -1,0 +1,12 @@
+dist/
+.astro/
+node_modules/
+.env
+.env.*
+.DS_Store
+npm-debug.log*
+
+# Referências do Claude Design (não fazem parte do site)
+referencia-*.zip
+referencia-vertex-auto/
+.claude/

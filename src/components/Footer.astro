@@ -1,0 +1,56 @@
+---
+import { url } from '../lib/url';
+---
+
+<footer class="footer">
+  <div class="container footer__inner">
+    <div>
+      <div class="footer__logo">Vertex Auto</div>
+      <p class="muted">[Tagline da Vertex Auto]</p>
+    </div>
+    <nav class="footer__links" aria-label="Rodapé">
+      <a href={url('#estoque')}>Estoque</a>
+      <a href={url('sobre/')}>Sobre</a>
+      <a href={url('anunciar/')}>Anunciar</a>
+    </nav>
+    <p class="muted footer__copy">© [ANO] Vertex Auto · projeto conceito</p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .footer__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px 40px;
+    flex-wrap: wrap;
+    padding-block: 40px;
+  }
+  .footer__logo {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.125rem;
+    text-transform: uppercase;
+  }
+  p {
+    margin-top: 4px;
+    font-size: 0.8125rem;
+  }
+  .footer__links {
+    display: flex;
+    gap: 28px;
+  }
+  .footer__copy {
+    margin: 0;
+  }
+  @media (max-width: 720px) {
+    .footer__inner {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>

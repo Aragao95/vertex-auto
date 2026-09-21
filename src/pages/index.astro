@@ -1,0 +1,402 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import CarCard from '../components/CarCard.astro';
+import Features from '../components/Features.astro';
+import ContactStrip from '../components/ContactStrip.astro';
+import { cars, categorias, destaques, carBySlug } from '../data/cars';
+
+const hero = carBySlug('countach')!.fotos[0];
+---
+
+<Base>
+  <section class="hero">
+    <Image
+      class="hero__bg"
+      src={hero}
+      alt="Lamborghini Countach preto"
+      widths={[768, 1280, 1920, 2560]}
+      sizes="100vw"
+      priority
+    />
+    <div class="hero__shade" aria-hidden="true"></div>
+
+    <div class="container">
+      <div class="hero__content">
+        <h1>Encontre o carro certo, sem rodeio.</h1>
+        <p class="hero__lead">Estoque revisado, fotos reais e negociação direta com quem cuida de cada carro.</p>
+
+        <form class="search" role="search" data-hero-search>
+          <div class="search__q">
+            <label class="visually-hidden" for="q">Buscar por marca ou modelo</label>
+            <input id="q" name="q" class="input" type="search" placeholder="Buscar por marca ou modelo" autocomplete="off" />
+          </div>
+          <span class="search__divider" aria-hidden="true"></span>
+          <div class="search__cat">
+            <label class="visually-hidden" for="cat">Categoria</label>
+            <select id="cat" name="cat" class="select">
+              <option value="">Todas categorias</option>
+              {categorias.map((c) => <option value={c.id}>{c.label}</option>)}
+            </select>
+          </div>
+          <button class="btn btn-primary" type="submit">Buscar</button>
+        </form>
+
+        <ul class="hero__proof">
+          <li>[Nº]+ carros revisados</li>
+          <li>Garantia em todo o estoque</li>
+          <li>Atendimento direto, sem intermediário</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="container block">
+    <h2>Em destaque</h2>
+    <div class="grid grid--featured">
+      {destaques.map((car) => <CarCard car={car} variant="featured" />)}
+    </div>
+  </section>
+
+  <section class="container block block--stock" id="estoque">
+    <div class="stock__head">
+      <h2>Todo o estoque</h2>
+      <p class="muted" aria-live="polite" data-count>{cars.length} carros</p>
+    </div>
+
+    <div class="chips stock__chips" role="group" aria-label="Filtrar por categoria">
+      <button type="button" class="chip" data-chip="" aria-pressed="true">Todos</button>
+      {categorias.map((c) => <button type="button" class="chip" data-chip={c.id} aria-pressed="false">{c.label}</button>)}
+    </div>
+
+    <p class="stock__query" data-query hidden>
+      Resultados para <strong data-query-text></strong>
+      <button type="button" class="stock__clear" data-clear>Limpar busca</button>
+    </p>
+
+    <div class="grid grid--stock" data-grid>
+      {cars.map((car) => <CarCard car={car} />)}
+    </div>
+
+    <div class="stock__empty" data-empty hidden>
+      <h3>Nenhum carro encontrado</h3>
+      <p class="muted">Tente outro termo ou outra categoria.</p>
+      <button type="button" class="btn btn-outline" data-reset>Ver todo o estoque</button>
+    </div>
+  </section>
+
+  <Features />
+  <ContactStrip />
+</Base>
+
+<style>
+  /* Hero */
+  .hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 640px;
+    overflow: hidden;
+    isolation: isolate;
+    background: #1e211e;
+  }
+  .hero__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 70% 55%;
+    z-index: -2;
+  }
+  .hero__shade {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(90deg, rgb(14 15 14 / 0.92) 0%, rgb(14 15 14 / 0.75) 40%, rgb(14 15 14 / 0.1) 75%);
+  }
+  .hero__content {
+    max-width: 680px;
+    padding-block: 64px;
+  }
+  .hero h1 {
+    color: #fff;
+  }
+  .hero__lead {
+    margin-top: 20px;
+    max-width: 520px;
+    font-size: 1.125rem;
+    color: rgb(255 255 255 / 0.88);
+  }
+
+  .search {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: min(820px, calc(100vw - 2 * var(--gutter)));
+    margin-top: 40px;
+    padding: 14px;
+    background: var(--surface);
+    border-radius: 10px;
+  }
+  .search__q {
+    flex: 1;
+  }
+  .search__divider {
+    width: 1px;
+    height: 32px;
+    background: var(--border);
+  }
+  .search__cat {
+    width: 190px;
+  }
+  .search .btn {
+    padding: 14px 28px;
+    font-size: 0.875rem;
+  }
+
+  .hero__proof {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 24px;
+    margin: 36px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.875rem;
+    color: #fff;
+  }
+  .hero__proof li + li::before {
+    content: '';
+    display: inline-block;
+    width: 1px;
+    height: 16px;
+    margin-right: 24px;
+    background: rgb(255 255 255 / 0.3);
+    vertical-align: middle;
+  }
+
+  /* Seções */
+  .block {
+    padding-block: 80px 72px;
+  }
+  .block h2 {
+    margin-bottom: 32px;
+  }
+  .block--stock {
+    padding-top: 0;
+    padding-bottom: 80px;
+  }
+  .grid {
+    display: grid;
+    gap: 24px;
+  }
+  .grid--featured {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .grid--stock {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .stock__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .stock__head p {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  .stock__chips {
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+  .stock__query {
+    margin: -16px 0 24px;
+    font-size: 0.9375rem;
+    color: var(--muted);
+  }
+  .stock__query strong {
+    color: var(--text);
+  }
+  .stock__clear {
+    margin-left: 8px;
+    padding: 0;
+    background: none;
+    border: 0;
+    color: var(--accent);
+    font: 600 0.875rem var(--font-body);
+    cursor: pointer;
+  }
+  .stock__clear:hover {
+    color: var(--accent-hover);
+  }
+  .stock__empty {
+    padding: 56px 24px;
+    text-align: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  .stock__empty p {
+    margin: 8px 0 24px;
+  }
+
+  @media (max-width: 1100px) {
+    .grid--stock {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 900px) {
+    .grid--featured,
+    .grid--stock {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .grid--featured > :global(:last-child) {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (max-width: 700px) {
+    .hero {
+      min-height: 0;
+      align-items: flex-end;
+    }
+    .hero {
+      background: var(--bg);
+    }
+    /* No celular a foto vira uma faixa no topo (carro inteiro) e o texto vem logo abaixo. */
+    .hero__bg {
+      bottom: auto;
+      height: auto;
+      aspect-ratio: 3 / 2;
+      object-position: 50% 50%;
+    }
+    .hero__shade {
+      bottom: auto;
+      aspect-ratio: 3 / 2;
+      background: linear-gradient(180deg, rgb(15 17 16 / 0) 55%, var(--bg) 100%);
+    }
+    .hero__content {
+      padding-block: calc((100vw * 2 / 3) - 48px) 40px;
+    }
+    .search {
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+      padding: 12px;
+      gap: 10px;
+    }
+    .search__divider {
+      display: none;
+    }
+    .search__cat {
+      width: 100%;
+    }
+    .hero__proof {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+      margin-top: 28px;
+    }
+    .hero__proof li + li::before {
+      display: none;
+    }
+    .block {
+      padding-block: 56px;
+    }
+    .block--stock {
+      padding-top: 0;
+    }
+    .stock__chips {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      margin-inline: calc(-1 * var(--gutter));
+      padding-inline: var(--gutter);
+      margin-bottom: 28px;
+      scrollbar-width: none;
+    }
+    .stock__chips .chip {
+      flex: none;
+    }
+  }
+  @media (max-width: 560px) {
+    .grid--featured,
+    .grid--stock {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  const cards = [...document.querySelectorAll<HTMLElement>('[data-grid] [data-car]')];
+  const chips = [...document.querySelectorAll<HTMLButtonElement>('[data-chip]')];
+  const count = document.querySelector<HTMLElement>('[data-count]')!;
+  const empty = document.querySelector<HTMLElement>('[data-empty]')!;
+  const queryBox = document.querySelector<HTMLElement>('[data-query]')!;
+  const queryText = document.querySelector<HTMLElement>('[data-query-text]')!;
+  const form = document.querySelector<HTMLFormElement>('[data-hero-search]')!;
+  const input = form.querySelector<HTMLInputElement>('input[name="q"]')!;
+  const select = form.querySelector<HTMLSelectElement>('select[name="cat"]')!;
+
+  const state = { q: '', cat: '' };
+  const normalize = (s: string) =>
+    s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+
+  function render() {
+    const q = normalize(state.q);
+    let visible = 0;
+    for (const card of cards) {
+      // Um carro pode ter várias categorias: aparece em qualquer filtro que contenha a escolhida.
+      const matchCat = !state.cat || card.dataset.cats!.split(' ').includes(state.cat);
+      const matchQ = !q || normalize(card.dataset.name!).includes(q);
+      card.hidden = !(matchCat && matchQ);
+      if (!card.hidden) visible++;
+    }
+    chips.forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.chip === state.cat)));
+    select.value = state.cat;
+    input.value = state.q;
+    count.textContent = `${visible} ${visible === 1 ? 'carro' : 'carros'}`;
+    empty.hidden = visible > 0;
+    queryBox.hidden = !state.q;
+    queryText.textContent = `“${state.q}”`;
+
+    const params = new URLSearchParams();
+    if (state.q) params.set('q', state.q);
+    if (state.cat) params.set('cat', state.cat);
+    const qs = params.toString();
+    history.replaceState(null, '', `${location.pathname}${qs ? `?${qs}` : ''}${location.hash}`);
+  }
+
+  chips.forEach((chip) =>
+    chip.addEventListener('click', () => {
+      state.cat = chip.dataset.chip ?? '';
+      render();
+    }),
+  );
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    state.q = input.value.trim();
+    state.cat = select.value;
+    render();
+    document.getElementById('estoque')!.scrollIntoView();
+  });
+
+  document.querySelector('[data-clear]')!.addEventListener('click', () => {
+    state.q = '';
+    render();
+  });
+  document.querySelector('[data-reset]')!.addEventListener('click', () => {
+    state.q = '';
+    state.cat = '';
+    render();
+  });
+
+  // Estado inicial a partir da URL (?q=...&cat=...).
+  const params = new URLSearchParams(location.search);
+  state.q = params.get('q') ?? '';
+  const cat = params.get('cat') ?? '';
+  state.cat = chips.some((c) => c.dataset.chip === cat) ? cat : '';
+  render();
+</script>

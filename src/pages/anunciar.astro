@@ -1,0 +1,219 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { carBySlug } from '../data/cars';
+
+const hero = carBySlug('ford-f100')!.fotos[0];
+
+const passos = [
+  { title: 'Envie os dados', text: 'Preencha o formulário com as informações básicas do carro. Leva menos de dois minutos.' },
+  { title: 'Avaliação', text: 'Nossa equipe analisa o modelo, o estado e o mercado, e retorna com uma proposta.' },
+  { title: 'Fotos profissionais', text: 'Fotografamos o carro com tratamento de imagem feito para chamar atenção no anúncio.' },
+  { title: 'Anúncio no ar', text: 'Publicamos no nosso estoque e cuidamos do contato com os interessados.' },
+];
+---
+
+<Base title="Anunciar meu carro" description="Venda seu carro com a Vertex Auto: avaliação justa, fotos profissionais e anúncio pronto.">
+  <section class="hero">
+    <Image class="hero__bg" src={hero} alt="Ford F-100 laranja e prata" widths={[768, 1280, 1920, 2560]} sizes="100vw" priority />
+    <div class="hero__shade" aria-hidden="true"></div>
+    <div class="container">
+      <div class="hero__content">
+        <h1>Venda seu carro com a gente</h1>
+        <p>Avaliação justa, fotos profissionais e anúncio pronto. Você só acompanha.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="container layout">
+    <section>
+      <h2>Como funciona</h2>
+      <ol class="steps">
+        {
+          passos.map((p, i) => (
+            <li>
+              <span class="steps__num">{i + 1}</span>
+              <div>
+                <h3>{p.title}</h3>
+                <p>{p.text}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <div class="form-card" data-form-wrap>
+      <form data-fake-form>
+        <h2>Dados do carro</h2>
+        <div class="form-grid">
+          <div class="field">
+            <label class="label" for="an-nome">Seu nome</label>
+            <input id="an-nome" name="nome" class="input" placeholder="Nome completo" autocomplete="name" required />
+          </div>
+          <div class="field">
+            <label class="label" for="an-wpp">WhatsApp</label>
+            <input id="an-wpp" name="whatsapp" class="input" type="tel" placeholder="(00) 00000-0000" autocomplete="tel" required />
+          </div>
+          <div class="field">
+            <label class="label" for="an-modelo">Marca e modelo</label>
+            <input id="an-modelo" name="modelo" class="input" placeholder="Ex: Ford F-100" required />
+          </div>
+          <div class="field">
+            <label class="label" for="an-ano">Ano</label>
+            <input id="an-ano" name="ano" class="input" inputmode="numeric" placeholder="[Ano]" required />
+          </div>
+          <div class="field">
+            <label class="label" for="an-km">Quilometragem</label>
+            <input id="an-km" name="km" class="input" inputmode="numeric" placeholder="[KM]" />
+          </div>
+          <div class="field">
+            <label class="label" for="an-valor">Valor pretendido</label>
+            <input id="an-valor" name="valor" class="input" inputmode="numeric" placeholder="R$" />
+          </div>
+          <div class="field field--full">
+            <label class="label" for="an-cidade">Cidade</label>
+            <input id="an-cidade" name="cidade" class="input" placeholder="Onde o carro está" />
+          </div>
+          <div class="field field--full">
+            <label class="label" for="an-obs">Observações</label>
+            <textarea id="an-obs" name="obs" class="textarea" rows="4" placeholder="Estado de conservação, histórico, opcionais..."></textarea>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-block submit" type="submit">Enviar para avaliação</button>
+        <p class="form-note">Sem compromisso. Seus dados não são compartilhados.</p>
+      </form>
+
+      <div class="confirm" data-form-confirm hidden>
+        <span class="confirm-icon"><Icon name="check" size={30} /></span>
+        <h3 tabindex="-1">Recebemos seus dados</h3>
+        <p>Entramos em contato pelo WhatsApp em até [prazo] com a avaliação.</p>
+        <button type="button" class="btn btn-outline" data-form-reset>Anunciar outro carro</button>
+      </div>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 340px;
+    overflow: hidden;
+    isolation: isolate;
+    background: #1e211e;
+  }
+  .hero__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 60% 60%;
+    z-index: -2;
+  }
+  .hero__shade {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(90deg, rgb(14 15 14 / 0.9) 0%, rgb(14 15 14 / 0.7) 45%, rgb(14 15 14 / 0.15) 80%);
+  }
+  .hero__content {
+    max-width: 680px;
+    padding-block: 48px;
+  }
+  .hero h1 {
+    font-size: clamp(2.2rem, 4vw, 3.25rem);
+    color: #fff;
+  }
+  .hero p {
+    margin-top: 16px;
+    max-width: 520px;
+    font-size: 1.0625rem;
+    color: rgb(255 255 255 / 0.88);
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: 72px;
+    align-items: start;
+    padding-block: 72px 88px;
+  }
+  .layout > section h2 {
+    margin-bottom: 36px;
+    font-size: 1.875rem;
+  }
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .steps li {
+    display: flex;
+    gap: 18px;
+  }
+  .steps__num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    color: #fff;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.125rem;
+  }
+  .steps h3 {
+    font-size: 1.1875rem;
+    text-transform: none;
+  }
+  .steps p {
+    margin-top: 6px;
+    max-width: 420px;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  .form-card {
+    padding: 36px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  .form-card h2 {
+    margin-bottom: 24px;
+    font-size: 1.5rem;
+  }
+  .submit {
+    margin-top: 24px;
+    padding: 16px;
+  }
+
+  @media (max-width: 960px) {
+    .layout {
+      grid-template-columns: 1fr;
+      gap: 48px;
+      padding-block: 56px;
+    }
+  }
+  @media (max-width: 700px) {
+    .hero__shade {
+      background: linear-gradient(90deg, rgb(14 15 14 / 0.92) 0%, rgb(14 15 14 / 0.7) 70%, rgb(14 15 14 / 0.4) 100%);
+    }
+  }
+  @media (max-width: 480px) {
+    .form-card {
+      padding: 22px;
+    }
+  }
+</style>
